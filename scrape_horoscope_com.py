@@ -43,17 +43,17 @@ def main(output_path):
         # Loop month.  index at 1
         for sign in range(1, 13):
             url = f"https://www.horoscope.com/us/horoscopes/general/horoscope-archive.aspx?sign={sign}&laDate={day}"
-            if url not in results:
-                urls.append(url)
+            if f"{day}:{sign}" not in results:
+                urls.append((url, day, sign))
 
-    with concurrent.futures.ThreadPoolExecutor(1) as executor:
+    with concurrent.futures.ThreadPoolExecutor(10) as executor:
         # Start the load operations and mark each future with its URL
-        future_to_url = {executor.submit(load_url, url, 60): url for url in urls}
+        future_to_url = {executor.submit(load_url, url[0], 60): url for url in urls}
         for future in tqdm(concurrent.futures.as_completed(future_to_url), total=len(urls)):
             url = future_to_url[future]
             try:
                 data = future.result().decode()
-                results[url] = data
+                results[f"{url[1]}:{url[2]}"] = data
                 save_results(results, output_path)
             except Exception as exc:
                 print("%r generated an exception: %s" % (url, exc))
