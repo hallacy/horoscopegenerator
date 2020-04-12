@@ -20,6 +20,6 @@ Creating horoscopes with Neural Nets
     conda activate <insert name here>
 
     # Next, install other dependencies
-    pip install -e requirements.txt
+    pip install -r requirements.txt
 
 
